@@ -1,0 +1,10 @@
+fastapi
+uvicorn[standard]
+httpx
+pydantic
+python-dotenv
+joblib
+pandas
+numpy
+scikit-learn
+slowapi

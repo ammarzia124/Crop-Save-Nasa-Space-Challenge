@@ -1,0 +1,19 @@
+# Render Blueprint for the CropSave API (NASA POWER-based drought prediction).
+# Frontend deploys separately on Vercel: Root Directory = frontend, env VITE_API_URL = <this service URL>.
+services:
+  - type: web
+    name: cropsave-api
+    runtime: python
+    rootDir: backend
+    buildCommand: pip install -r requirements.txt
+    startCommand: uvicorn main:app --host 0.0.0.0 --port $PORT
+    healthCheckPath: /health
+    envVars:
+      - key: PYTHON_VERSION
+        value: 3.11.9
+      - key: CORS_ORIGINS
+        value: "*"
+        # For production, update to: https://cropsave.vercel.app
+      - key: MODEL_PATH
+        value: ../ml/models/random_forest.joblib
+        # Path to trained ML model (relative to backend/)
