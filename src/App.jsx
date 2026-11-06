@@ -14,7 +14,7 @@ function App() {
   const [selectedDistrict, setSelectedDistrict] = useState(null);
   const [riskData, setRiskData] = useState(null);
   const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState('home'); // 'home' | 'predict' | 'result'
+  const [activeSection, setActiveSection] = useState('home');
 
   const handleGetForecast = () => {
     setActiveSection('predict');
@@ -31,29 +31,50 @@ function App() {
   const handlePredict = async (district) => {
     setLoading(true);
     try {
-      // Try real backend first
-      const response = await axios.post('http://localhost:8000/predict', {
+      // ── Real backend: Ammar's FastAPI ──
+      // Request body:  { lat, lon, district_name }
+      // Response body: { district_name, risk_score, risk_level, soil_moisture,
+      //                  rainfall_last_30_days, temperature_max, humidity, prediction_date }
+      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
+      const response = await axios.post(`${API_URL}/predict`, {
         lat: district.lat,
         lon: district.lon,
-        district: district.name,
-      }, { timeout: 5000 });
-      setRiskData(response.data);
+        district_name: district.name,   // Ammar uses "district_name"
+      }, { timeout: 8000 });
+
+      const d = response.data;
+      // Normalise to the field names the UI components expect
+      setRiskData({
+        score:        d.risk_score,                 // risk_score        → score
+        level:        d.risk_level,                 // risk_level        → level
+        soil_moisture: d.soil_moisture,
+        rainfall_30d:  d.rainfall_last_30_days,     // rainfall_last_30_days → rainfall_30d
+        temp_max:      d.temperature_max,           // temperature_max   → temp_max
+        humidity:      d.humidity,
+        district:      d.district_name,
+        timestamp:     new Date(d.prediction_date).toLocaleDateString('en-US', {
+          year: 'numeric', month: 'long', day: 'numeric',
+        }),
+      });
+
     } catch {
-      // Backend not ready — use mock data
+      // Backend offline → use mock data so the UI still works for demos
       await new Promise((r) => setTimeout(r, 2200));
       const mockScore = Math.floor(Math.random() * 100);
       setRiskData({
-        score: mockScore,
-        level: mockScore <= 30 ? 'LOW' : mockScore <= 65 ? 'MEDIUM' : 'HIGH',
+        score:        mockScore,
+        level:        mockScore <= 30 ? 'LOW' : mockScore <= 65 ? 'MEDIUM' : 'HIGH',
         soil_moisture: (Math.random() * 40 + 10).toFixed(1),
-        rainfall_30d: (Math.random() * 80).toFixed(1),
-        temp_max: (Math.random() * 15 + 25).toFixed(1),
-        district: district.name,
-        timestamp: new Date().toLocaleDateString('en-US', {
+        rainfall_30d:  (Math.random() * 80).toFixed(1),
+        temp_max:      (Math.random() * 15 + 25).toFixed(1),
+        humidity:      (Math.random() * 40 + 30).toFixed(1),
+        district:      district.name,
+        timestamp:     new Date().toLocaleDateString('en-US', {
           year: 'numeric', month: 'long', day: 'numeric',
         }),
       });
     }
+
     setLoading(false);
     setActiveSection('result');
     setTimeout(() => {
@@ -72,20 +93,15 @@ function App() {
 
   return (
     <div style={{ minHeight: '100vh', position: 'relative', background: '#030a06' }}>
-      {/* Animated background — always shown */}
       <ParticleBackground />
-
-      {/* Loading overlay */}
       {loading && <LoadingSpinner />}
-
-      {/* Navbar */}
       <Navbar onGetForecast={handleGetForecast} />
 
-      {/* ─── HOME SECTION ─── */}
+      {/* HOME */}
       <HeroSection onGetForecast={handleGetForecast} />
       <HowItWorks />
 
-      {/* ─── PREDICT SECTION ─── */}
+      {/* PREDICT */}
       <div id="predict-section">
         <PakistanMap
           onSelectDistrict={handleSelectDistrict}
@@ -94,7 +110,7 @@ function App() {
         />
       </div>
 
-      {/* ─── RESULT SECTION ─── */}
+      {/* RESULT */}
       {riskData && (
         <div id="result-section">
           <RiskCard
@@ -110,7 +126,7 @@ function App() {
         </div>
       )}
 
-      {/* ─── FOOTER ─── */}
+      {/* FOOTER */}
       <footer style={{
         position: 'relative', zIndex: 1, textAlign: 'center',
         padding: '40px 24px',
