@@ -8,6 +8,7 @@ import PakistanMap from './components/PakistanMap';
 import RiskCard from './components/RiskCard';
 import AdvisoryPanel from './components/AdvisoryPanel';
 import LoadingSpinner from './components/LoadingSpinner';
+import Charts from './components/Charts';
 import './index.css';
 
 function App() {
@@ -42,6 +43,8 @@ function App() {
         district_name: district.name,   // Ammar uses "district_name"
       }, { timeout: 8000 });
 
+      console.log('Prediction response:', response.data);
+      
       const d = response.data;
       // Normalise to the field names the UI components expect
       setRiskData({
@@ -104,10 +107,12 @@ function App() {
       {/* PREDICT */}
       <div id="predict-section">
         <PakistanMap
-          onSelectDistrict={handleSelectDistrict}
-          selectedDistrict={selectedDistrict}
-          onPredict={handlePredict}
-        />
+            selectedDistrict={selectedDistrict}
+            // onSelectDistrict={setSelectedDistrict}
+            onSelectDistrict={handleSelectDistrict}
+            onPredict={handlePredict}
+            riskData={riskData}
+          />
       </div>
 
       {/* RESULT */}
@@ -116,7 +121,15 @@ function App() {
           <RiskCard
             riskData={riskData}
             district={selectedDistrict}
-            onReset={handleReset}
+            // onReset={handleReset}
+            onReset={() => setRiskData(null)}
+          />
+          // Chart
+          <Charts
+            // lat={selectedDistrict.lat}
+            // lon={selectedDistrict.lon}
+            district={selectedDistrict}
+
           />
           <AdvisoryPanel
             level={riskData.level}

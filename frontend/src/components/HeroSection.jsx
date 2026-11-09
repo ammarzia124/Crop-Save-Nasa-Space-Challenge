@@ -13,19 +13,23 @@ const StatCard = ({ icon: Icon, value, label, delay }) => {
     <div
       className="glass"
       style={{
-        padding: '24px 28px',
-        display: 'flex',
-        flexDirection: 'column',
-        alignItems: 'center',
-        gap: '10px',
-        minWidth: '160px',
-        opacity: visible ? 1 : 0,
-        transform: visible ? 'translateY(0)' : 'translateY(30px)',
-        transition: `all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms`,
-        animation: visible ? 'float 3s ease-in-out infinite' : 'none',
-        animationDelay: `${delay * 0.5}ms`,
-        cursor: 'default',
-      }}
+          padding: '24px 28px',
+          display: 'flex',
+          flexDirection: 'column',
+          alignItems: 'center',
+          gap: '10px',
+          minWidth: '160px',
+          opacity: visible ? 1 : 0,
+          transform: visible ? 'translateY(0)' : 'translateY(30px)',
+          transition: `all 0.7s cubic-bezier(0.34, 1.56, 0.64, 1) ${delay}ms`,
+          // 👇 fixed: all longhand, no shorthand mixing
+          animationName: visible ? 'float' : 'none',
+          animationDuration: '3s',
+          animationTimingFunction: 'ease-in-out',
+          animationIterationCount: 'infinite',
+          animationDelay: `${delay * 0.5}ms`,
+          cursor: 'default',
+        }}
       onMouseEnter={e => {
         e.currentTarget.style.borderColor = 'rgba(16,185,129,0.4)';
         e.currentTarget.style.boxShadow = '0 0 20px rgba(16,185,129,0.2)';
