@@ -93,7 +93,7 @@ git push origin main  # Auto-deploys to Render
 | **Muhammad Ammar Zia** | Team Lead, Backend Engineer |
 | **Atiqua** | Frontend Developer |
 | **Muavia** | ML Engineer |
-| **Sohaib** | Data Engineer |
+| **Sohaib Altaf** | Data Engineer |
 | **Sahal** | Frontend Developer |
 
 ---
