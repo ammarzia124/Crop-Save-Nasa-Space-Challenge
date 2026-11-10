@@ -142,9 +142,9 @@ const PakistanMap = ({
 
               return (
                 <CircleMarker
-                  key={district.name}
+                  key={`${district.name}-${districtIsSelected ? (selectedRisk || 'selected') : 'normal'}`}
                   center={[district.lat, district.lon]}
-                  radius={districtIsSelected ? 10 : hoveredDistrict === district.name ? 9 : 7}
+                  radius={districtIsSelected ? (selectedRisk ? 12 : 10) : hoveredDistrict === district.name ? 9 : 7}
                   pathOptions={{
                     fillColor: markerStyle.fill,
                     fillOpacity: districtIsSelected ? 1 : 0.85,
@@ -170,7 +170,7 @@ const PakistanMap = ({
                       backdropFilter: 'blur(10px)',
                       boxShadow: `0 0 12px ${markerStyle.fill}`,
                     }}>
-                      📍 {district.name}{districtIsSelected && selectedRiskStyle.label ? ` · ${selectedRiskStyle.label}` : ''}
+                      📍 {district.name}{districtIsSelected && selectedRiskStyle.label ? ` · ${selectedRiskStyle.label} RISK` : ''}
                     </div>
                   </Tooltip>
                 </CircleMarker>
@@ -200,7 +200,7 @@ const PakistanMap = ({
                 </span>
                 {selectedRiskStyle.label && (
                   <span style={{ color: selectedRiskStyle.fill, fontWeight: '700', fontSize: '12px' }}>
-                    {selectedRiskStyle.label}
+                    {selectedRiskStyle.label} RISK
                   </span>
                 )}
                 <span style={{ color: 'rgba(226,232,240,0.4)', fontSize: '12px' }}>

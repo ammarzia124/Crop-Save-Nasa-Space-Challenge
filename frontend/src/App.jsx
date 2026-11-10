@@ -30,6 +30,12 @@ function App() {
   };
 
   const handlePredict = async (district) => {
+    const targetDistrict = district || selectedDistrict;
+    if (!targetDistrict) {
+      console.warn('handlePredict: No district specified');
+      return;
+    }
+
     setLoading(true);
     try {
       // ── Real backend: Ammar's FastAPI ──
@@ -38,47 +44,53 @@ function App() {
       //                  rainfall_last_30_days, temperature_max, humidity, prediction_date }
       const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
       const response = await axios.post(`${API_URL}/predict`, {
-        lat: district.lat,
-        lon: district.lon,
-        district_name: district.name,   // Ammar uses "district_name"
-      }, { timeout: 8000 });
+        lat: targetDistrict.lat,
+        lon: targetDistrict.lon,
+        district_name: targetDistrict.name,
+      }, { timeout: 25000 });
 
       console.log('Prediction response:', response.data);
-      
+
       const d = response.data;
       // Normalise to the field names the UI components expect
       setRiskData({
-        score:        d.risk_score,                 // risk_score        → score
-        level:        d.risk_level,                 // risk_level        → level
+        score:         d.risk_score,
+        level:         d.risk_level,
         soil_moisture: d.soil_moisture,
-        rainfall_30d:  d.rainfall_last_30_days,     // rainfall_last_30_days → rainfall_30d
-        temp_max:      d.temperature_max,           // temperature_max   → temp_max
+        rainfall_30d:  d.rainfall_last_30_days,
+        temp_max:      d.temperature_max,
         humidity:      d.humidity,
-        district:      d.district_name,
-        timestamp:     new Date(d.prediction_date).toLocaleDateString('en-US', {
-          year: 'numeric', month: 'long', day: 'numeric',
-        }),
+        district:      d.district_name || targetDistrict.name,
+        timestamp:     d.prediction_date
+          ? new Date(d.prediction_date).toLocaleDateString('en-US', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            })
+          : new Date().toLocaleDateString('en-US', {
+              year: 'numeric', month: 'long', day: 'numeric',
+            }),
       });
 
-    } catch {
-      // Backend offline → use mock data so the UI still works for demos
-      await new Promise((r) => setTimeout(r, 2200));
+    } catch (err) {
+      console.warn('Backend unavailable, using fallback mock data:', err);
+      // Backend offline or timeout → use realistic mock data so demo keeps running
+      await new Promise((r) => setTimeout(r, 1000));
       const mockScore = Math.floor(Math.random() * 100);
       setRiskData({
-        score:        mockScore,
-        level:        mockScore <= 30 ? 'LOW' : mockScore <= 65 ? 'MEDIUM' : 'HIGH',
-        soil_moisture: (Math.random() * 40 + 10).toFixed(1),
-        rainfall_30d:  (Math.random() * 80).toFixed(1),
-        temp_max:      (Math.random() * 15 + 25).toFixed(1),
-        humidity:      (Math.random() * 40 + 30).toFixed(1),
-        district:      district.name,
+        score:         mockScore,
+        level:         mockScore <= 30 ? 'LOW' : mockScore <= 65 ? 'MEDIUM' : 'HIGH',
+        soil_moisture: parseFloat((Math.random() * 40 + 10).toFixed(1)),
+        rainfall_30d:  parseFloat((Math.random() * 80).toFixed(1)),
+        temp_max:      parseFloat((Math.random() * 15 + 25).toFixed(1)),
+        humidity:      parseFloat((Math.random() * 40 + 30).toFixed(1)),
+        district:      targetDistrict.name,
         timestamp:     new Date().toLocaleDateString('en-US', {
           year: 'numeric', month: 'long', day: 'numeric',
         }),
       });
+    } finally {
+      setLoading(false);
     }
 
-    setLoading(false);
     setActiveSection('result');
     setTimeout(() => {
       document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
@@ -107,12 +119,11 @@ function App() {
       {/* PREDICT */}
       <div id="predict-section">
         <PakistanMap
-            selectedDistrict={selectedDistrict}
-            // onSelectDistrict={setSelectedDistrict}
-            onSelectDistrict={handleSelectDistrict}
-            onPredict={handlePredict}
-            riskData={riskData}
-          />
+          selectedDistrict={selectedDistrict}
+          onSelectDistrict={handleSelectDistrict}
+          onPredict={handlePredict}
+          riskData={riskData}
+        />
       </div>
 
       {/* RESULT */}
@@ -121,16 +132,14 @@ function App() {
           <RiskCard
             riskData={riskData}
             district={selectedDistrict}
-            // onReset={handleReset}
-            onReset={() => setRiskData(null)}
+            onReset={handleReset}
           />
-          // Chart
-          <Charts
-            // lat={selectedDistrict.lat}
-            // lon={selectedDistrict.lon}
-            district={selectedDistrict}
 
+          {/* 12-Month Rainfall History Chart */}
+          <Charts
+            district={selectedDistrict}
           />
+
           <AdvisoryPanel
             level={riskData.level}
             district={selectedDistrict}
