@@ -23,6 +23,10 @@ env/
 *.joblib
 *.h5
 *.pth
+!ml/models/*.joblib
+!ml/models/*.pkl
+!backend/models/*.joblib
+!backend/models/*.pkl
 
 # IDE
 .vscode/
