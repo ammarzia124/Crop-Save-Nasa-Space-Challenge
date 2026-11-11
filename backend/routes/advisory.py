@@ -5,7 +5,7 @@ This is the creative part of the project that gives farmers actionable advice.
 """
 from typing import List, Literal
 from fastapi import APIRouter, Query, HTTPException
-from pydantic import BaseModel
+from pydantic import BaseModel, Field
 
 router = APIRouter()
 
@@ -20,7 +20,9 @@ class AdviceItem(BaseModel):
 class AdvisoryResponse(BaseModel):
     """Complete advisory response."""
     risk_level: str
-    advice: List[AdviceItem]
+    language: str = "en"
+    advice: List[AdviceItem] = Field(default_factory=list)
+    tips: List[AdviceItem] = Field(default_factory=list)
 
 
 # English advice content
@@ -171,32 +173,34 @@ def get_advisory(
         ...,
         description="Drought risk level",
         pattern="^(LOW|MEDIUM|HIGH)$"
+    ),
+    lang: str = Query(
+        "en",
+        description="Language code: en for English, ur for Urdu",
+        pattern="^(en|ur)$"
     )
 ):
-    """
-    Get farming advice based on drought risk level (English).
-
-    Returns 4 actionable advice items with urgency levels:
-    - LOW risk: normal urgency (green light for farming)
-    - MEDIUM risk: warning urgency (take precautions)
-    - HIGH risk: critical urgency (emergency actions needed)
-    """
+    """Get farming advice based on drought risk level."""
     risk_level = risk_level.upper()
+    lang = lang.lower()
 
-    if risk_level not in ADVICE_EN:
+    advice_dict = ADVICE_EN if lang == "en" else ADVICE_UR
+    if risk_level not in advice_dict:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid risk level. Must be LOW, MEDIUM, or HIGH."
+            detail="Invalid risk level. Must be LOW, MEDIUM, or HIGH."
         )
 
-    print(f"📢 Advisory requested for risk level: {risk_level}")
+    print(f"Advisory requested for risk level: {risk_level} in {lang.upper()}")
 
-    advice_items = [AdviceItem(**item) for item in ADVICE_EN[risk_level]]
-
-    return AdvisoryResponse(
+    advice_items = [AdviceItem(**item) for item in advice_dict[risk_level]]
+    payload = AdvisoryResponse(
         risk_level=risk_level,
-        advice=advice_items
+        language=lang,
+        advice=advice_items,
+        tips=advice_items,
     )
+    return payload
 
 
 @router.get("/advisory/languages")
@@ -212,33 +216,23 @@ def get_advisory_languages(
         pattern="^(en|ur)$"
     )
 ):
-    """
-    Get farming advice in multiple languages for Pakistani farmers.
-
-    Supports:
-    - en: English (default)
-    - ur: Urdu (اردو)
-
-    Returns the same structured advice in the requested language.
-    """
+    """Get farming advice in multiple languages for Pakistani farmers."""
     risk_level = risk_level.upper()
     lang = lang.lower()
 
-    # Select appropriate language dictionary
     advice_dict = ADVICE_EN if lang == "en" else ADVICE_UR
-
     if risk_level not in advice_dict:
         raise HTTPException(
             status_code=400,
-            detail=f"Invalid risk level. Must be LOW, MEDIUM, or HIGH."
+            detail="Invalid risk level. Must be LOW, MEDIUM, or HIGH."
         )
 
-    print(f"📢 Advisory requested: {risk_level} in {lang.upper()}")
+    print(f"Advisory requested: {risk_level} in {lang.upper()}")
 
     advice_items = [AdviceItem(**item) for item in advice_dict[risk_level]]
-
     return {
         "risk_level": risk_level,
         "language": lang,
-        "advice": advice_items
+        "advice": advice_items,
+        "tips": advice_items,
     }

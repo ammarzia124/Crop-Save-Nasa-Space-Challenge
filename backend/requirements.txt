@@ -1,6 +1,6 @@
 fastapi
 uvicorn[standard]
-httpx
+httpx<0.28
 pydantic
 python-dotenv
 joblib

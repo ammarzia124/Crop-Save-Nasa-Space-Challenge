@@ -43,7 +43,7 @@ def history(
             target_lon = d["lon"]
             target_name = d["name"]
         else:
-            target_name = clean_name
+            raise HTTPException(404, f"District '{clean_name}' not found")
 
     if target_lat is None or target_lon is None:
         if lat is not None and lon is not None:

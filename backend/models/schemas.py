@@ -20,3 +20,4 @@ class PredictResponse(BaseModel):
     temperature_max: float
     humidity: float
     prediction_date: str
+    features: dict = Field(default_factory=dict, description="Feature values used by the model")
