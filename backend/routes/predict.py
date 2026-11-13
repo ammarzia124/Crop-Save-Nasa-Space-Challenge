@@ -40,7 +40,7 @@ except FileNotFoundError:
 
 
 @router.post("/predict", response_model=PredictResponse)
-@limiter.limit("30/minute")
+@limiter.limit("10/minute")
 def predict(request: Request, req: PredictRequest):
     """Predict 30-day drought risk for a district location."""
     print(f"\n{'='*60}")
