@@ -1,9 +1,9 @@
-import React from 'react';
 import { Satellite } from 'lucide-react';
 
 const LoadingSpinner = () => {
   return (
     <div
+      className="crop-save-loading-overlay"
       style={{
         position: 'fixed',
         inset: 0,
@@ -12,8 +12,8 @@ const LoadingSpinner = () => {
         flexDirection: 'column',
         alignItems: 'center',
         justifyContent: 'center',
-        background: 'rgba(3,10,6,0.85)',
-        backdropFilter: 'blur(16px)',
+        background: 'rgba(245,245,243,0.86)',
+        backdropFilter: 'blur(8px)',
       }}
     >
       {/* Outer ring */}
@@ -22,16 +22,16 @@ const LoadingSpinner = () => {
         <div style={{
           position: 'absolute', inset: 0,
           borderRadius: '50%',
-          border: '3px solid rgba(16,185,129,0.15)',
-          borderTopColor: '#10b981',
+          border: '3px solid rgba(59,109,17,0.15)',
+          borderTopColor: '#3B6D11',
           animation: 'spin-slow 1.2s linear infinite',
         }} />
         {/* Second ring */}
         <div style={{
           position: 'absolute', inset: '12px',
           borderRadius: '50%',
-          border: '2px solid rgba(16,185,129,0.08)',
-          borderBottomColor: '#34d399',
+          border: '2px solid rgba(59,109,17,0.1)',
+          borderBottomColor: '#639922',
           animation: 'spin-slow 1.8s linear infinite reverse',
         }} />
         {/* Center icon */}
@@ -41,20 +41,20 @@ const LoadingSpinner = () => {
         }}>
           <div style={{
             width: '60px', height: '60px', borderRadius: '50%',
-            background: 'rgba(16,185,129,0.1)',
-            border: '1px solid rgba(16,185,129,0.3)',
+            background: '#EAF3DE',
+            border: '1px solid #B7D0A4',
             display: 'flex', alignItems: 'center', justifyContent: 'center',
-            boxShadow: '0 0 20px rgba(16,185,129,0.3)',
+            boxShadow: '0 2px 8px rgba(59,109,17,0.12)',
             animation: 'pulse-glow 2s ease-in-out infinite',
           }}>
-            <Satellite size={26} color="#10b981" />
+            <Satellite size={26} color="#3B6D11" />
           </div>
         </div>
       </div>
 
       {/* Text */}
       <p style={{
-        color: '#10b981',
+        color: '#3B6D11',
         fontSize: '15px',
         fontWeight: '600',
         letterSpacing: '0.5px',
@@ -62,7 +62,7 @@ const LoadingSpinner = () => {
       }}>
         Fetching NASA satellite data...
       </p>
-      <p style={{ color: 'rgba(226,232,240,0.35)', fontSize: '13px', marginTop: '8px' }}>
+      <p style={{ color: '#888780', fontSize: '13px', marginTop: '8px' }}>
         Analyzing soil moisture · rainfall · temperature
       </p>
 
@@ -73,7 +73,7 @@ const LoadingSpinner = () => {
             key={i}
             style={{
               width: '6px', height: '6px', borderRadius: '50%',
-              background: '#10b981',
+              background: '#3B6D11',
               animation: `pulse ${0.6 + i * 0.2}s ease-in-out ${i * 0.2}s infinite`,
             }}
           />

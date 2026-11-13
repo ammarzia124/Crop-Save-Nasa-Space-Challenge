@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { Droplets, CloudRain, Thermometer, MapPin, Calendar } from 'lucide-react';
 import RiskGauge from './RiskGauge';
 
@@ -7,27 +7,27 @@ const LEVEL_CONFIG = {
     label: 'LOW RISK',
     glassClass: 'glass-emerald',
     glowClass: 'glow-emerald',
-    badgeColor: '#10b981',
-    badgeBg: 'rgba(16,185,129,0.15)',
-    badgeBorder: 'rgba(16,185,129,0.5)',
+    badgeColor: '#0F6E56',
+    badgeBg: '#E1F5EE',
+    badgeBorder: '#9CCFBC',
     emoji: '✅',
   },
   MEDIUM: {
     label: 'MEDIUM RISK',
     glassClass: 'glass-amber',
     glowClass: 'glow-amber',
-    badgeColor: '#f59e0b',
-    badgeBg: 'rgba(245,158,11,0.15)',
-    badgeBorder: 'rgba(245,158,11,0.5)',
+    badgeColor: '#854F0B',
+    badgeBg: '#FAEEDA',
+    badgeBorder: '#E4D4B8',
     emoji: '⚠️',
   },
   HIGH: {
     label: 'HIGH RISK',
     glassClass: 'glass-red',
     glowClass: 'glow-red',
-    badgeColor: '#ef4444',
-    badgeBg: 'rgba(239,68,68,0.15)',
-    badgeBorder: 'rgba(239,68,68,0.5)',
+    badgeColor: '#A32D2D',
+    badgeBg: '#FCEBEB',
+    badgeBorder: '#E8C1BE',
     emoji: '🚨',
   },
 };
@@ -56,12 +56,12 @@ const StatBadge = ({ icon: Icon, value, label, color, delay }) => {
     >
       <Icon size={18} color={color} />
       <div style={{ fontSize: '18px', fontWeight: '800', color }}>{value}</div>
-      <div style={{ fontSize: '11px', color: 'rgba(226,232,240,0.5)', fontWeight: '500' }}>{label}</div>
+      <div style={{ fontSize: '11px', color: '#888780', fontWeight: '500' }}>{label}</div>
     </div>
   );
 };
 
-const RiskCard = ({ riskData, district, onReset }) => {
+const RiskCard = ({ riskData, district }) => {
   const [visible, setVisible] = useState(false);
   useEffect(() => {
     const t = setTimeout(() => setVisible(true), 100);
@@ -72,14 +72,14 @@ const RiskCard = ({ riskData, district, onReset }) => {
   const cfg = LEVEL_CONFIG[level];
 
   return (
-    <section style={{ padding: '40px 24px 60px', position: 'relative', zIndex: 1 }}>
+    <section style={{ padding: '20px 24px 32px', position: 'relative', zIndex: 1 }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         {/* Result heading */}
         <div style={{ textAlign: 'center', marginBottom: '32px' }}>
-          <p style={{ color: '#10b981', fontSize: '13px', fontWeight: '600', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '8px' }}>
+          <p style={{ color: '#3B6D11', fontSize: '11px', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px' }}>
             Prediction Complete
           </p>
-          <h2 style={{ fontSize: 'clamp(24px, 4vw, 40px)', fontWeight: '800', color: '#e2e8f0', letterSpacing: '-1px' }}>
+          <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: '800', color: '#1A1A1A', letterSpacing: '-0.5px' }}>
             Drought Risk for <span className="gradient-text">{district?.name}</span>
           </h2>
         </div>
@@ -97,12 +97,12 @@ const RiskCard = ({ riskData, district, onReset }) => {
           {/* Header row */}
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '32px', flexWrap: 'wrap', gap: '12px' }}>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <MapPin size={14} color="rgba(226,232,240,0.5)" />
-              <span style={{ color: 'rgba(226,232,240,0.7)', fontSize: '14px' }}>{district?.name}</span>
+              <MapPin size={14} color="#888780" />
+              <span style={{ color: '#1A1A1A', fontSize: '14px' }}>{district?.name}</span>
             </div>
             <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-              <Calendar size={14} color="rgba(226,232,240,0.5)" />
-              <span style={{ color: 'rgba(226,232,240,0.5)', fontSize: '13px' }}>{riskData?.timestamp}</span>
+              <Calendar size={14} color="#888780" />
+              <span style={{ color: '#888780', fontSize: '13px' }}>{riskData?.timestamp}</span>
             </div>
           </div>
 
@@ -120,7 +120,7 @@ const RiskCard = ({ riskData, district, onReset }) => {
                 borderRadius: '50px',
                 padding: '10px 28px',
                 display: 'flex', alignItems: 'center', gap: '10px',
-                boxShadow: `0 0 20px ${cfg.badgeBg}`,
+                boxShadow: '0 1px 3px rgba(26,26,26,0.06)',
                 animation: 'pulse 2s ease-in-out infinite',
               }}
             >
@@ -144,28 +144,28 @@ const RiskCard = ({ riskData, district, onReset }) => {
               icon={Droplets}
               value={`${riskData?.soil_moisture || '--'}%`}
               label="Soil Moisture"
-              color="#06b6d4"
+              color="#0F6E56"
               delay={400}
             />
             <StatBadge
               icon={CloudRain}
               value={`${riskData?.rainfall_30d || '--'} mm`}
               label="Rain (30 days)"
-              color="#8b5cf6"
+              color="#3B6D11"
               delay={550}
             />
             <StatBadge
               icon={Thermometer}
               value={`${riskData?.temp_max || '--'}°C`}
               label="Max Temp"
-              color="#f59e0b"
+              color="#854F0B"
               delay={700}
             />
           </div>
 
           {/* NASA attribution */}
           <div style={{ marginTop: '20px', textAlign: 'center' }}>
-            <span style={{ fontSize: '11px', color: 'rgba(226,232,240,0.3)' }}>
+            <span style={{ fontSize: '11px', color: '#888780' }}>
               📡 Powered by NASA POWER API · SMAP Soil Moisture Data
             </span>
           </div>

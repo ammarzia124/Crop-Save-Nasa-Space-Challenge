@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import {
   Sprout, Droplets, TrendingUp,
   AlertTriangle, CloudOff, AlertOctagon, Phone,
@@ -9,19 +9,19 @@ const ADVISORIES = {
   LOW: [
     {
       icon: Sprout,
-      color: '#10b981',
+      color: '#0F6E56',
       title: 'Great Time to Plant',
       desc: 'Good conditions for wheat, cotton, or rice. Soil moisture is adequate for healthy germination.',
     },
     {
       icon: Droplets,
-      color: '#06b6d4',
+      color: '#3B6D11',
       title: 'Normal Irrigation',
       desc: 'Maintain your regular irrigation schedule. No water stress expected in the next 30 days.',
     },
     {
       icon: TrendingUp,
-      color: '#8b5cf6',
+      color: '#639922',
       title: 'Apply Fertilizer',
       desc: 'Favorable conditions for fertilizer application this month. Maximize your yield potential.',
     },
@@ -29,19 +29,19 @@ const ADVISORIES = {
   MEDIUM: [
     {
       icon: AlertTriangle,
-      color: '#f59e0b',
+      color: '#854F0B',
       title: 'Moderate Risk Detected',
       desc: 'Consider switching to drought-resistant crop varieties like sorghum, millet, or barley.',
     },
     {
       icon: Droplets,
-      color: '#f97316',
+      color: '#0F6E56',
       title: 'Reduce Irrigation by 20%',
       desc: 'Reduce irrigation frequency. Use drip irrigation if available to conserve water resources.',
     },
     {
       icon: CloudOff,
-      color: '#f59e0b',
+      color: '#854F0B',
       title: 'Prepare Water Storage',
       desc: 'Rainfall may be below average. Prepare water storage solutions before conditions worsen.',
     },
@@ -49,19 +49,19 @@ const ADVISORIES = {
   HIGH: [
     {
       icon: AlertOctagon,
-      color: '#ef4444',
+      color: '#A32D2D',
       title: 'HIGH RISK — Avoid Water-Intensive Crops',
       desc: 'Do not plant water-intensive crops. Severe drought conditions are predicted for your area.',
     },
     {
       icon: Droplets,
-      color: '#ef4444',
+      color: '#A32D2D',
       title: 'Maximum Water Conservation',
       desc: 'Switch to minimal irrigation immediately. Every liter of water must be conserved right now.',
     },
     {
       icon: Phone,
-      color: '#f97316',
+      color: '#854F0B',
       title: 'Contact Agricultural Department',
       desc: 'Contact your local agricultural department for emergency drought relief and government support.',
     },
@@ -93,7 +93,7 @@ const AdvisoryCard = ({ icon: Icon, color, title, desc, delay }) => {
         e.currentTarget.style.boxShadow = `0 8px 30px ${color}15, 0 0 0 1px ${color}20`;
       }}
       onMouseLeave={e => {
-        e.currentTarget.style.borderColor = 'rgba(255,255,255,0.08)';
+        e.currentTarget.style.borderColor = '#E5E5E3';
         e.currentTarget.style.boxShadow = 'none';
       }}
     >
@@ -109,10 +109,10 @@ const AdvisoryCard = ({ icon: Icon, color, title, desc, delay }) => {
 
       {/* Content */}
       <div>
-        <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#e2e8f0', marginBottom: '6px' }}>
+        <h4 style={{ fontSize: '15px', fontWeight: '700', color: '#1A1A1A', marginBottom: '6px' }}>
           {title}
         </h4>
-        <p style={{ fontSize: '13px', color: 'rgba(226,232,240,0.6)', lineHeight: '1.6', margin: 0 }}>
+        <p style={{ fontSize: '13px', color: '#66665F', lineHeight: '1.6', margin: 0 }}>
           {desc}
         </p>
       </div>
@@ -122,10 +122,10 @@ const AdvisoryCard = ({ icon: Icon, color, title, desc, delay }) => {
 
 const AdvisoryPanel = ({ level = 'LOW', district, onReset }) => {
   const advisories = ADVISORIES[level];
-  const levelColors = { LOW: '#10b981', MEDIUM: '#f59e0b', HIGH: '#ef4444' };
+  const levelColors = { LOW: '#0F6E56', MEDIUM: '#854F0B', HIGH: '#A32D2D' };
 
   return (
-    <section style={{ padding: '0 24px 100px', position: 'relative', zIndex: 1 }}>
+    <section style={{ padding: '0 24px 32px', position: 'relative', zIndex: 1 }}>
       <div style={{ maxWidth: '680px', margin: '0 auto' }}>
         {/* Heading */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '12px', marginBottom: '24px' }}>
@@ -138,10 +138,10 @@ const AdvisoryPanel = ({ level = 'LOW', district, onReset }) => {
             <Lightbulb size={20} color={levelColors[level]} />
           </div>
           <div>
-            <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#e2e8f0', margin: 0 }}>
+            <h3 style={{ fontSize: '20px', fontWeight: '800', color: '#1A1A1A', margin: 0 }}>
               Farming Advisory
             </h3>
-            <p style={{ fontSize: '13px', color: 'rgba(226,232,240,0.4)', margin: 0, marginTop: '2px' }}>
+            <p style={{ fontSize: '13px', color: '#888780', margin: 0, marginTop: '2px' }}>
               Based on {level} drought risk · {district?.name}
             </p>
           </div>
@@ -172,7 +172,7 @@ const AdvisoryPanel = ({ level = 'LOW', district, onReset }) => {
 
         {/* Footer note */}
         <div style={{ marginTop: '24px', textAlign: 'center' }}>
-          <p style={{ fontSize: '12px', color: 'rgba(226,232,240,0.25)', lineHeight: '1.6' }}>
+          <p style={{ fontSize: '12px', color: '#888780', lineHeight: '1.6' }}>
             Advisory is generated based on NASA satellite data and AI predictions.
             Always consult your local agricultural extension officer for final decisions.
           </p>

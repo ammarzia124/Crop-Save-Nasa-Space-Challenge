@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import { useState } from 'react';
 import { MapContainer, TileLayer, CircleMarker, Tooltip } from 'react-leaflet';
 import 'leaflet/dist/leaflet.css';
 import { MapPin, Navigation, Zap } from 'lucide-react';
@@ -29,31 +29,31 @@ const PAKISTAN_DISTRICTS = [
 const RISK_STYLES = {
   LOW: {
     label: 'LOW',
-    fill: '#22c55e',
-    border: '#86efac',
-    background: 'rgba(34,197,94,0.14)',
-    shadow: '0 0 8px #22c55e',
+    fill: '#0f6e56',
+    border: '#1d9e75',
+    background: 'rgba(15,110,86,0.12)',
+    shadow: '0 0 8px rgba(15,110,86,0.3)',
   },
   MEDIUM: {
     label: 'MEDIUM',
-    fill: '#eab308',
-    border: '#fef08a',
-    background: 'rgba(234,179,8,0.16)',
-    shadow: '0 0 8px #eab308',
+    fill: '#854f0b',
+    border: '#d49b3f',
+    background: 'rgba(250,238,218,0.8)',
+    shadow: '0 0 8px rgba(133,79,11,0.2)',
   },
   HIGH: {
     label: 'HIGH',
-    fill: '#ef4444',
-    border: '#fca5a5',
-    background: 'rgba(239,68,68,0.16)',
-    shadow: '0 0 8px #ef4444',
+    fill: '#a32d2d',
+    border: '#d58c86',
+    background: 'rgba(252,235,235,0.9)',
+    shadow: '0 0 8px rgba(163,45,45,0.2)',
   },
   DEFAULT: {
     label: '',
-    fill: '#10b981',
-    border: '#6ee7b7',
-    background: 'rgba(16,185,129,0.12)',
-    shadow: '0 0 8px #10b981',
+    fill: '#3b6d11',
+    border: '#639922',
+    background: 'rgba(234,243,222,0.9)',
+    shadow: '0 0 8px rgba(59,109,17,0.2)',
   },
 };
 
@@ -86,6 +86,7 @@ const PakistanMap = ({
   selectedDistrict,
   onPredict,
   riskData,
+  isLoading = false,
 }) => {
   const [hoveredDistrict, setHoveredDistrict] = useState(null);
   const selectedRisk = normalizeRisk(riskData);
@@ -95,17 +96,17 @@ const PakistanMap = ({
     selectedDistrict && selectedDistrict.name === district.name;
 
   return (
-    <section style={{ padding: '60px 24px 80px', position: 'relative', zIndex: 1 }}>
+    <section style={{ padding: '24px 0', position: 'relative', zIndex: 1 }}>
       <div style={{ maxWidth: '1100px', margin: '0 auto' }}>
         {/* Heading */}
         <div style={{ textAlign: 'center', marginBottom: '48px' }}>
-          <p style={{ color: '#10b981', fontSize: '13px', fontWeight: '600', letterSpacing: '3px', textTransform: 'uppercase', marginBottom: '12px' }}>
-            Step 1
+          <p style={{ color: '#3B6D11', fontSize: '11px', fontWeight: '700', letterSpacing: '1.5px', textTransform: 'uppercase', marginBottom: '8px' }}>
+            Drought forecast
           </p>
-          <h2 style={{ fontSize: 'clamp(26px, 4vw, 44px)', fontWeight: '800', letterSpacing: '-1px', color: '#e2e8f0', marginBottom: '12px' }}>
+          <h2 style={{ fontSize: 'clamp(22px, 3vw, 30px)', fontWeight: '800', letterSpacing: '-0.5px', color: '#1A1A1A', marginBottom: '8px' }}>
             Select Your <span className="gradient-text">District</span>
           </h2>
-          <p style={{ color: 'rgba(226,232,240,0.55)', fontSize: '15px' }}>
+          <p style={{ color: '#888780', fontSize: '14px' }}>
             Click any district marker on the map to get your drought forecast
           </p>
         </div>
@@ -116,9 +117,11 @@ const PakistanMap = ({
           style={{
             padding: '4px',
             overflow: 'hidden',
+            border: '1px solid #E5E5E3',
+            borderRadius: '16px',
             boxShadow: selectedDistrict
-              ? `0 0 40px ${selectedRiskStyle.background}, 0 0 80px rgba(16,185,129,0.08)`
-              : '0 0 40px rgba(0,0,0,0.4)',
+              ? `0 4px 16px ${selectedRiskStyle.background}`
+              : '0 1px 3px rgba(59,109,17,0.08), 0 4px 12px rgba(59,109,17,0.06)',
             transition: 'box-shadow 0.5s ease',
           }}
         >
@@ -127,7 +130,7 @@ const PakistanMap = ({
             zoom={5}
             style={{ height: '480px', width: '100%', borderRadius: '16px' }}
             zoomControl={true}
-            attributionControl={false}
+            attributionControl
           >
             {/* Free tile layers — no API key needed */}
             <TileLayer
@@ -148,7 +151,7 @@ const PakistanMap = ({
                   pathOptions={{
                     fillColor: markerStyle.fill,
                     fillOpacity: districtIsSelected ? 1 : 0.85,
-                    color: districtIsSelected ? markerStyle.border : 'rgba(16,185,129,0.6)',
+                    color: districtIsSelected ? markerStyle.border : 'rgba(59,109,17,0.6)',
                     weight: districtIsSelected ? 3 : 1.5,
                   }}
                   eventHandlers={{
@@ -159,7 +162,7 @@ const PakistanMap = ({
                 >
                   <Tooltip permanent={false} direction="top" offset={[0, -8]}>
                     <div style={{
-                      background: 'rgba(3,10,6,0.95)',
+                      background: '#FFFFFF',
                       border: `1px solid ${markerStyle.border}`,
                       borderRadius: '8px',
                       padding: '4px 10px',
@@ -168,7 +171,7 @@ const PakistanMap = ({
                       fontSize: '12px',
                       fontWeight: '600',
                       backdropFilter: 'blur(10px)',
-                      boxShadow: `0 0 12px ${markerStyle.fill}`,
+                      boxShadow: '0 2px 8px rgba(26,26,26,0.12)',
                     }}>
                       📍 {district.name}{districtIsSelected && selectedRiskStyle.label ? ` · ${selectedRiskStyle.label} RISK` : ''}
                     </div>
@@ -183,7 +186,7 @@ const PakistanMap = ({
         <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'space-between', marginTop: '24px', flexWrap: 'wrap', gap: '16px' }}>
           {/* Selected badge */}
           <div style={{ display: 'flex', alignItems: 'center', gap: '12px' }}>
-            <MapPin size={16} color={selectedDistrict ? selectedRiskStyle.fill : 'rgba(226,232,240,0.3)'} />
+            <MapPin size={16} color={selectedDistrict ? selectedRiskStyle.fill : '#888780'} />
             {selectedDistrict ? (
               <div style={{
                 background: selectedRiskStyle.background,
@@ -203,12 +206,12 @@ const PakistanMap = ({
                     {selectedRiskStyle.label} RISK
                   </span>
                 )}
-                <span style={{ color: 'rgba(226,232,240,0.4)', fontSize: '12px' }}>
+                <span style={{ color: '#888780', fontSize: '12px' }}>
                   {selectedDistrict.lat.toFixed(2)}°N, {selectedDistrict.lon.toFixed(2)}°E
                 </span>
               </div>
             ) : (
-              <span style={{ color: 'rgba(226,232,240,0.4)', fontSize: '14px' }}>
+              <span style={{ color: '#888780', fontSize: '14px' }}>
                 No district selected
               </span>
             )}
@@ -218,7 +221,7 @@ const PakistanMap = ({
           <button
             className="btn-emerald"
             onClick={() => selectedDistrict && onPredict(selectedDistrict)}
-            disabled={!selectedDistrict}
+            disabled={!selectedDistrict || isLoading}
             style={{
               display: 'flex', alignItems: 'center', gap: '10px',
               fontSize: '15px', padding: '13px 28px',
@@ -232,8 +235,8 @@ const PakistanMap = ({
         </div>
 
         {/* Risk legend */}
-        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '18px', color: 'rgba(226,232,240,0.55)', fontSize: '12px' }}>
-          <span style={{ color: 'rgba(226,232,240,0.4)', marginRight: '2px' }}>Risk:</span>
+        <div style={{ display: 'flex', alignItems: 'center', gap: '16px', flexWrap: 'wrap', marginTop: '18px', color: '#66665F', fontSize: '12px' }}>
+          <span style={{ color: '#888780', marginRight: '2px' }}>Risk:</span>
           {['LOW', 'MEDIUM', 'HIGH'].map((risk) => (
             <span key={risk} style={{ display: 'inline-flex', alignItems: 'center', gap: '6px' }}>
               <span style={{ width: '8px', height: '8px', borderRadius: '50%', background: RISK_STYLES[risk].fill, boxShadow: RISK_STYLES[risk].shadow }} />
@@ -245,7 +248,7 @@ const PakistanMap = ({
         {/* District Quick Select Dropdown */}
         <div style={{ marginTop: '20px' }}>
           <div style={{ position: 'relative', maxWidth: '320px' }}>
-            <Navigation size={14} color="#10b981" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', zIndex: 1 }} />
+            <Navigation size={14} color="#3B6D11" style={{ position: 'absolute', left: '14px', top: '50%', transform: 'translateY(-50%)', zIndex: 1 }} />
             <select
               onChange={(e) => {
                 const d = PAKISTAN_DISTRICTS.find(d => d.name === e.target.value);
@@ -254,22 +257,21 @@ const PakistanMap = ({
               value={selectedDistrict?.name || ''}
               style={{
                 width: '100%',
-                background: 'rgba(255,255,255,0.04)',
-                border: '1px solid rgba(16,185,129,0.25)',
+                background: '#FFFFFF',
+                border: '1px solid #E5E5E3',
                 borderRadius: '12px',
                 padding: '11px 14px 11px 38px',
-                color: selectedDistrict ? '#e2e8f0' : 'rgba(226,232,240,0.4)',
+                color: selectedDistrict ? '#1A1A1A' : '#888780',
                 fontSize: '14px',
                 fontFamily: 'Inter, sans-serif',
                 cursor: 'pointer',
-                backdropFilter: 'blur(10px)',
                 appearance: 'none',
                 outline: 'none',
               }}
             >
               <option value="" disabled>Or search by name...</option>
               {PAKISTAN_DISTRICTS.map(d => (
-                <option key={d.name} value={d.name} style={{ background: '#0a1a0f' }}>{d.name}</option>
+                <option key={d.name} value={d.name}>{d.name}</option>
               ))}
             </select>
           </div>

@@ -1,9 +1,9 @@
-import React, { useEffect, useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
 const COLORS = {
-  LOW: { primary: '#10b981', secondary: '#34d399', glow: 'rgba(16,185,129,0.5)' },
-  MEDIUM: { primary: '#f59e0b', secondary: '#fbbf24', glow: 'rgba(245,158,11,0.5)' },
-  HIGH: { primary: '#ef4444', secondary: '#f87171', glow: 'rgba(239,68,68,0.5)' },
+  LOW: { primary: '#0f6e56', secondary: '#1d9e75', glow: 'rgba(15,110,86,0.25)' },
+  MEDIUM: { primary: '#854f0b', secondary: '#b57922', glow: 'rgba(133,79,11,0.25)' },
+  HIGH: { primary: '#a32d2d', secondary: '#c25d55', glow: 'rgba(163,45,45,0.25)' },
 };
 
 const RiskGauge = ({ score = 0, level = 'LOW' }) => {
@@ -52,13 +52,14 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
       if (progress < 1) rafRef.current = requestAnimationFrame(step);
     };
 
-    // Reset and animate
-    setAnimatedScore(0);
-    setTimeout(() => {
+    const timeoutId = setTimeout(() => {
       rafRef.current = requestAnimationFrame(step);
     }, 200);
 
-    return () => cancelAnimationFrame(rafRef.current);
+    return () => {
+      clearTimeout(timeoutId);
+      cancelAnimationFrame(rafRef.current);
+    };
   }, [score]);
 
   // The filled arc angle based on score
@@ -83,9 +84,9 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
             </feMerge>
           </filter>
           <linearGradient id="arcGradient" x1="0%" y1="0%" x2="100%" y2="0%">
-            <stop offset="0%" stopColor="#10b981" />
-            <stop offset="50%" stopColor="#f59e0b" />
-            <stop offset="100%" stopColor="#ef4444" />
+            <stop offset="0%" stopColor="#0f6e56" />
+            <stop offset="50%" stopColor="#b57922" />
+            <stop offset="100%" stopColor="#a32d2d" />
           </linearGradient>
         </defs>
 
@@ -93,7 +94,7 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
         <path
           d={describeArc(START_ANGLE, END_ANGLE, RADIUS)}
           fill="none"
-          stroke="rgba(255,255,255,0.06)"
+          stroke="rgba(26,26,26,0.1)"
           strokeWidth={STROKE}
           strokeLinecap="round"
         />
@@ -102,21 +103,21 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
         <path
           d={describeArc(-180, -126, RADIUS - 2)}
           fill="none"
-          stroke="rgba(16,185,129,0.15)"
+          stroke="rgba(15,110,86,0.12)"
           strokeWidth={STROKE - 4}
           strokeLinecap="round"
         />
         <path
           d={describeArc(-126, -63, RADIUS - 2)}
           fill="none"
-          stroke="rgba(245,158,11,0.12)"
+          stroke="rgba(133,79,11,0.12)"
           strokeWidth={STROKE - 4}
           strokeLinecap="round"
         />
         <path
           d={describeArc(-63, 0, RADIUS - 2)}
           fill="none"
-          stroke="rgba(239,68,68,0.12)"
+          stroke="rgba(163,45,45,0.12)"
           strokeWidth={STROKE - 4}
           strokeLinecap="round"
         />
@@ -144,7 +145,7 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
               key={tick}
               x1={inner.x} y1={inner.y}
               x2={outer.x} y2={outer.y}
-              stroke="rgba(255,255,255,0.15)"
+              stroke="rgba(26,26,26,0.16)"
               strokeWidth={1.5}
             />
           );
@@ -160,7 +161,7 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
               x={pos.x} y={pos.y}
               textAnchor="middle"
               dominantBaseline="central"
-              fill="rgba(226,232,240,0.35)"
+              fill="#888780"
               fontSize="10"
               fontFamily="Inter, sans-serif"
             >
@@ -177,7 +178,7 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
         />
         {/* Needle center dot */}
         <circle cx={CX} cy={CY} r={10} fill={colors.primary} filter="url(#glow)" />
-        <circle cx={CX} cy={CY} r={5} fill="#030a06" />
+        <circle cx={CX} cy={CY} r={5} fill="#FFFFFF" />
 
         {/* Score number */}
         <text
@@ -197,7 +198,7 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
         <text
           x={CX + 28} y={CY - 12}
           textAnchor="middle"
-          fill="rgba(226,232,240,0.3)"
+          fill="#888780"
           fontSize="12"
           fontFamily="Inter, sans-serif"
         >
@@ -205,9 +206,9 @@ const RiskGauge = ({ score = 0, level = 'LOW' }) => {
         </text>
 
         {/* Zone labels */}
-        <text x={CX - 80} y={CY + 14} textAnchor="middle" fill="rgba(16,185,129,0.6)" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">LOW</text>
-        <text x={CX} y={CY + 6} textAnchor="middle" fill="rgba(245,158,11,0.6)" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">MED</text>
-        <text x={CX + 80} y={CY + 14} textAnchor="middle" fill="rgba(239,68,68,0.6)" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">HIGH</text>
+        <text x={CX - 80} y={CY + 14} textAnchor="middle" fill="#0F6E56" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">LOW</text>
+        <text x={CX} y={CY + 6} textAnchor="middle" fill="#854F0B" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">MED</text>
+        <text x={CX + 80} y={CY + 14} textAnchor="middle" fill="#A32D2D" fontSize="10" fontFamily="Inter, sans-serif" fontWeight="600">HIGH</text>
       </svg>
     </div>
   );

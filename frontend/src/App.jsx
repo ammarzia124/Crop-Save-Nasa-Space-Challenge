@@ -1,168 +1,60 @@
-import React, { useState } from 'react';
-import axios from 'axios';
-import ParticleBackground from './components/ParticleBackground';
-import Navbar from './components/Navbar';
-import HeroSection from './components/HeroSection';
-import HowItWorks from './components/HowItWorks';
-import PakistanMap from './components/PakistanMap';
-import RiskCard from './components/RiskCard';
-import AdvisoryPanel from './components/AdvisoryPanel';
-import LoadingSpinner from './components/LoadingSpinner';
-import Charts from './components/Charts';
-import './index.css';
+import { lazy, Suspense } from 'react';
+import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
+import { AuthProvider } from './context/AuthContext';
+import ProtectedRoute from './components/ProtectedRoute';
 
-function App() {
-  const [selectedDistrict, setSelectedDistrict] = useState(null);
-  const [riskData, setRiskData] = useState(null);
-  const [loading, setLoading] = useState(false);
-  const [activeSection, setActiveSection] = useState('home');
+import SplashPage    from './pages/SplashPage';
+import LoginPage     from './pages/LoginPage';
+import SignupPage    from './pages/SignupPage';
+import ForgotPage    from './pages/ForgotPage';
 
-  const handleGetForecast = () => {
-    setActiveSection('predict');
-    setTimeout(() => {
-      document.getElementById('predict-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
+import AppLayout     from './pages/app/AppLayout';
+import HomePage      from './pages/app/HomePage';
+import PredictPage   from './pages/app/PredictPage';
+import AnalyticsPage from './pages/app/AnalyticsPage';
+import VarietiesPage from './pages/app/VarietiesPage';
+import ProfilePage   from './pages/app/ProfilePage';
 
-  const handleSelectDistrict = (district) => {
-    setSelectedDistrict(district);
-    setRiskData(null);
-  };
+const CropSaveFeature = lazy(() => import('./features/crop-save/CropSaveFeature'));
 
-  const handlePredict = async (district) => {
-    const targetDistrict = district || selectedDistrict;
-    if (!targetDistrict) {
-      console.warn('handlePredict: No district specified');
-      return;
-    }
-
-    setLoading(true);
-    try {
-      // ── Real backend: Ammar's FastAPI ──
-      // Request body:  { lat, lon, district_name }
-      // Response body: { district_name, risk_score, risk_level, soil_moisture,
-      //                  rainfall_last_30_days, temperature_max, humidity, prediction_date }
-      const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8000';
-      const response = await axios.post(`${API_URL}/predict`, {
-        lat: targetDistrict.lat,
-        lon: targetDistrict.lon,
-        district_name: targetDistrict.name,
-      }, { timeout: 25000 });
-
-      console.log('Prediction response:', response.data);
-
-      const d = response.data;
-      // Normalise to the field names the UI components expect
-      setRiskData({
-        score:         d.risk_score,
-        level:         d.risk_level,
-        soil_moisture: d.soil_moisture,
-        rainfall_30d:  d.rainfall_last_30_days,
-        temp_max:      d.temperature_max,
-        humidity:      d.humidity,
-        district:      d.district_name || targetDistrict.name,
-        timestamp:     d.prediction_date
-          ? new Date(d.prediction_date).toLocaleDateString('en-US', {
-              year: 'numeric', month: 'long', day: 'numeric',
-            })
-          : new Date().toLocaleDateString('en-US', {
-              year: 'numeric', month: 'long', day: 'numeric',
-            }),
-      });
-
-    } catch (err) {
-      console.warn('Backend unavailable, using fallback mock data:', err);
-      // Backend offline or timeout → use realistic mock data so demo keeps running
-      await new Promise((r) => setTimeout(r, 1000));
-      const mockScore = Math.floor(Math.random() * 100);
-      setRiskData({
-        score:         mockScore,
-        level:         mockScore <= 30 ? 'LOW' : mockScore <= 65 ? 'MEDIUM' : 'HIGH',
-        soil_moisture: parseFloat((Math.random() * 40 + 10).toFixed(1)),
-        rainfall_30d:  parseFloat((Math.random() * 80).toFixed(1)),
-        temp_max:      parseFloat((Math.random() * 15 + 25).toFixed(1)),
-        humidity:      parseFloat((Math.random() * 40 + 30).toFixed(1)),
-        district:      targetDistrict.name,
-        timestamp:     new Date().toLocaleDateString('en-US', {
-          year: 'numeric', month: 'long', day: 'numeric',
-        }),
-      });
-    } finally {
-      setLoading(false);
-    }
-
-    setActiveSection('result');
-    setTimeout(() => {
-      document.getElementById('result-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 200);
-  };
-
-  const handleReset = () => {
-    setRiskData(null);
-    setSelectedDistrict(null);
-    setActiveSection('predict');
-    setTimeout(() => {
-      document.getElementById('predict-section')?.scrollIntoView({ behavior: 'smooth' });
-    }, 100);
-  };
-
+export default function App() {
   return (
-    <div style={{ minHeight: '100vh', position: 'relative', background: '#030a06' }}>
-      <ParticleBackground />
-      {loading && <LoadingSpinner />}
-      <Navbar onGetForecast={handleGetForecast} />
+    <AuthProvider>
+      <BrowserRouter>
+        <Routes>
+          <Route path="/"       element={<Navigate to="/splash" replace />} />
+          <Route path="/splash" element={<SplashPage />} />
+          <Route path="/login"  element={<LoginPage />} />
+          <Route path="/signup" element={<SignupPage />} />
+          <Route path="/forgot" element={<ForgotPage />} />
 
-      {/* HOME */}
-      <HeroSection onGetForecast={handleGetForecast} />
-      <HowItWorks />
+          <Route
+            path="/app"
+            element={
+              <ProtectedRoute>
+                <AppLayout />
+              </ProtectedRoute>
+            }
+          >
+            <Route index                element={<Navigate to="/app/home" replace />} />
+            <Route path="home"          element={<HomePage />} />
+            <Route path="predict"       element={<PredictPage />} />
+            <Route path="analytics"     element={<AnalyticsPage />} />
+            <Route path="varieties"     element={<VarietiesPage />} />
+            <Route path="profile"       element={<ProfilePage />} />
+            <Route
+              path="crop-save"
+              element={(
+                <Suspense fallback={<div className="p-6 text-sm text-muted" role="status">Loading CropSave…</div>}>
+                  <CropSaveFeature />
+                </Suspense>
+              )}
+            />
+          </Route>
 
-      {/* PREDICT */}
-      <div id="predict-section">
-        <PakistanMap
-          selectedDistrict={selectedDistrict}
-          onSelectDistrict={handleSelectDistrict}
-          onPredict={handlePredict}
-          riskData={riskData}
-        />
-      </div>
-
-      {/* RESULT */}
-      {riskData && (
-        <div id="result-section">
-          <RiskCard
-            riskData={riskData}
-            district={selectedDistrict}
-            onReset={handleReset}
-          />
-
-          {/* 12-Month Rainfall History Chart */}
-          <Charts
-            district={selectedDistrict}
-          />
-
-          <AdvisoryPanel
-            level={riskData.level}
-            district={selectedDistrict}
-            onReset={handleReset}
-          />
-        </div>
-      )}
-
-      {/* FOOTER */}
-      <footer style={{
-        position: 'relative', zIndex: 1, textAlign: 'center',
-        padding: '40px 24px',
-        borderTop: '1px solid rgba(16,185,129,0.08)',
-      }}>
-        <p style={{ color: 'rgba(226,232,240,0.25)', fontSize: '13px' }}>
-          🌱 CropSave · NASA Space Apps Challenge 2026 · Team CropSave
-        </p>
-        <p style={{ color: 'rgba(226,232,240,0.15)', fontSize: '12px', marginTop: '6px' }}>
-          Powered by NASA POWER API · NASA SMAP · Built with React + Tailwind
-        </p>
-      </footer>
-    </div>
+          <Route path="*" element={<Navigate to="/splash" replace />} />
+        </Routes>
+      </BrowserRouter>
+    </AuthProvider>
   );
 }
-
-export default App;
