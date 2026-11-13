@@ -14,6 +14,12 @@ services:
       - key: CORS_ORIGINS
         value: "*"
         # For production, update to: https://cropsave.vercel.app
+      - key: NASA_POWER_BASE_URL
+        value: https://power.larc.nasa.gov/api/temporal/daily/point
       - key: MODEL_PATH
         value: ../ml/models/random_forest.joblib
         # Path to trained ML model (relative to backend/)
+      - key: SCALER_PATH
+        value: ../ml/models/scaler.joblib
+      - key: ENVIRONMENT
+        value: production
